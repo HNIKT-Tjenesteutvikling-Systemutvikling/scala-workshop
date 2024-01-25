@@ -4,6 +4,8 @@
 //> using dep com.github.plokhotnyuk.jsoniter-scala::jsoniter-scala-core::2.27.5
 //> using dep com.github.plokhotnyuk.jsoniter-scala::jsoniter-scala-macros::2.27.5
 //> using dep ch.qos.logback:logback-classic:1.4.14
+//> using dep io.indigoengine::tyrian::0.10.0
+
 //> using option -Werror -Wunused:all
 
 package no.hnikt
@@ -24,7 +26,7 @@ object Main extends IOApp.Simple:
         .build // Om vi trenger en http klient
 
       httpApp = {
-        routes.helloWorldRoutes
+        routes.index
       }.orNotFound
 
       finalHttpApp = Logger.httpApp(true, true)(httpApp)

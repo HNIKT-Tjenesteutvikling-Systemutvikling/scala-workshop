@@ -4,18 +4,28 @@ package routes
 import org.http4s.HttpRoutes
 import org.http4s.dsl.io.*
 import cats.effect.IO
-import no.hnikt.extensions.JsonCodec.given
-import com.github.plokhotnyuk.jsoniter_scala.macros.JsonCodecMaker
-import com.github.plokhotnyuk.jsoniter_scala.core.JsonValueCodec
+import tyrian.*
+import tyrian.Html.*
+import org.http4s.headers.`Content-Type`
+import org.http4s.MediaType
+import org.http4s.Response
 
-case class HelloWorldResponse(
-    message: String
-)
+private[routes] def htmlResponse(html: String): IO[Response[IO]] =
+  Ok(html).map(_.withContentType(`Content-Type`(MediaType.text.html)))
 
-object HelloWorldResponse:
-  given JsonValueCodec[HelloWorldResponse] = JsonCodecMaker.make
+def index: HttpRoutes[IO] =
+  val indexPage =
+    "<!DOCTYPE html>" + html(
+      head(
+        meta(charset := "utf-8"),
+        script(src := "https://unpkg.com/htmx.org@1.9.10")(),
+        script(src := "https://unpkg.com/htmx.org/dist/ext/ws.js")()
+      ),
+      div(
+        h1("Hello World!")
+      )
+    )
 
-def helloWorldRoutes: HttpRoutes[IO] =
   HttpRoutes.of[IO]:
-    case GET -> Root / "hello" =>
-      Ok(HelloWorldResponse("Hello World!"))
+    case GET -> Root =>
+      htmlResponse(indexPage)
